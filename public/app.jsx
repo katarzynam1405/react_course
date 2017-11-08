@@ -1,49 +1,85 @@
-var Greeter = React.createClass({
-  getDefaultProps: () => {
-    return {
-      name : 'React',
-      post : 'Hello user nice to met you!'
+var GreeterMessage = React.createClass({
+    render: function () {
+      var name = this.props.name;
+      var message = this.props.message;
+
+      return (
+        <div>
+          <h1>Hello {name}!</h1>
+          <p>{message}</p>
+        </div>
+      );
     }
-  },
-  getInitialState: function() {
-    return {
-      name: this.props.name
-    };
-  },
-  onButtonClick: function (e) {
+});
+
+var GreeterForm = React.createClass({
+  onFormSubmit: function (e) {
     e.preventDefault();
 
-    var nameRef = this.refs.name;
+    var update = {};
 
-    var name = nameRef.value;
-    nameRef.value="";
+    var name = this.refs.name.value;
+    var message = this.refs.message.value;
 
-    if (typeof name === "string" && name.length > 0) {
-    this.setState({
-      name: name
-    });
-    }
+    if (name.length > 0) {
+      this.refs.name.value = '';
+      update.name = name;
+    };
+    if (message.length > 0) {
+      this.refs.message.value = '';
+      update.message = message;
+    };
+
+    this.props.onNewData(update);
+  },
+  render: function () {
+    return (
+      <form onSubmit={this.onFormSubmit}>
+        <div>
+          <input type="text" ref="name"></input>
+        </div>
+        <div>
+          <textarea ref="message" placeholder="Set message"></textarea>
+        </div>
+        <button>Submit</button>
+      </form>
+    );
+  }
+});
+
+var Greeter = React.createClass({
+  getDefaultProps: function () {
+    return {
+      name: 'React',
+      message: 'This is the default message!'
+    };
+  },
+  getInitialState: function () {
+    return {
+        name: this.props.name,
+        message: this.props.message
+    };
+  },
+  handleNewData: function (update) {
+    this.setState(update);
   },
   render: function () {
     var name = this.state.name;
-    var post = this.props.post;
+    var message = this.state.message;
 
     return (
       <div>
-        <h1>Hello {name}</h1>
-        <p>{post}</p>
-
-        <form onSubmit = {this.onButtonClick}>
-          <input type="text" ref="name"></input>
-          <button>Set name</button>
-        </form>
+        <GreeterMessage name={name} message={message}/>
+        <GreeterForm onNewData={this.handleNewData}/>
       </div>
     );
   }
 });
 
+var firstName = 'Kasia';
+var message = "Hi!"
 
-  ReactDOM.render(
-    <Greeter name={name} post="Message from prop"/>,
-    document.getElementById('app')
-  );
+ReactDOM.render(
+  <Greeter name={firstName} message={message}/>,
+  document.getElementById('app')
+);
